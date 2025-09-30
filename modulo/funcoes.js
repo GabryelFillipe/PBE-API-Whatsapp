@@ -164,22 +164,42 @@ function getContactMessageByUser(telefone, contato) {
             })
         })
 
-        return informacoesContato
+        return contactMessageUser
     }
 
 }
 
 // Função para fitrar mensagens a um contato de um usuário
-function filterContactMessage(telefone,contato,teste){
+function filterContactMessage(telefone, contato, palavraChave) {
     const number = telefone
 
     let informacoesUsuario = dados.contatos['whats-users'].find(user => user.number === number)
+    if (!informacoesUsuario)
+        return { MESSAGE_ERRO, message: "usuario não encontrado" }
 
     let informacoesContato = informacoesUsuario.contacts.find(contact => contact.name === contato)
+    if (!informacoesContato)
+        return { MESSAGE_ERRO, message: `Contato ${contato} não encontrado` }
 
-    let mensagens = informacoesContato.messages.find(message => message.content.includes(teste))
+    let mensagem = informacoesContato.messages.filter(message => message.content.includes(palavraChave))
 
-    return mensagens
+    if (mensagem == undefined) {
+        return MESSAGE_ERRO
+    } else {
+
+        let user = informacoesUsuario.nickname
+
+        let mensagensFiltradas = {
+            status: true,
+            status_code: 200,
+            development: 'Gabryel Fillipe Cavalcanti da Silva',
+            user: user,
+            contato: contato,
+            mensagens: mensagem
+        }
+        return mensagensFiltradas
+    }
+     
 }
 
 // Exportando funções da API
@@ -191,6 +211,3 @@ module.exports = {
     getContactMessageByUser,
     filterContactMessage
 }
-
-// console.log(getContactMessageByUser('11987876567', 'Ana Maria'))
-// console.log(filterContactMessage('11987876567', 'Ana Maria','?'))
